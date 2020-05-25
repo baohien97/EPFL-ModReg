@@ -75,7 +75,17 @@ droprow <- c(1:length(CountryPop))[is.na(CountryPop)]
 DeathsByCountry <- DeathsByCountry[-droprow,]
 CasesByCountry <- CasesByCountry[-droprow,]
 CountryPop <- CountryPop[-droprow]
-CountryNames <- CountryNames[-droprow]
+CountryNames <- CountryNames[-droprow]  
+
+all_datas = list(DeathsByCountry, CasesByCountry, CountryNames, CountryPop)
+all_datas_names = c("DeathsByCountry", "CasesByCountry", "CountryNames", "CountryPop")
+
+# write data in files 
+for (i in 1:length(all_datas)){
+  # print(i)
+  write.csv(all_datas[i], paste(all_datas_names[i], ".csv", sep=""))
+}
+    
 
 # function for plotting (smoothed) country data, including
 
