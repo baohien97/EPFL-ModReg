@@ -6,7 +6,7 @@ library(readxl)
 
 library(gam) # not default lib in my current version of R
 
-deaths <- read.csv("full_data.csv")  # update file name (noting typo!) as necessary
+deaths <- read.csv("latest_data.csv")  # update file name (noting typo!) as necessary
 
 # create names and labels for countries
 
@@ -83,10 +83,9 @@ all_datas_names = c("DeathsByCountry", "CasesByCountry", "CountryNames", "Countr
 # write data in files 
 for (i in 1:length(all_datas)){
   # print(i)
-  write.csv(all_datas[i], paste(all_datas_names[i], ".csv", sep=""))
+  saveRDS(all_datas[i], paste(all_datas_names[i], ".rds", sep=""))
 }
-    
-
+# saveRDS(CountryPop, "CountryPop.rds")
 # function for plotting (smoothed) country data, including
 
 plot.Country <- function(country, names=CountryNames, deaths=DeathsByCountry, cases=CasesByCountry, pop=CountryPop, plot=F, plot.cumul=F, xmin=1, ...)
