@@ -75,16 +75,17 @@ deaths.cases.Continent = function(continent, chosen.countries=NULL, pop=CountryP
     # sub.m <- x[m>0]
     # sub.y <- x[y>0]
     xmin=1
-    plot(x, m/con.pop, main=continent, xlab="Days since 31 December 2019", 
+    plot(x, m/con.pop, main=continent, xlab="Days since 31 December 2019",
          ylab="Cumulative cases/deaths per million", pch=16, cex=0.9, xlim=c(xmin,n.days),
-         log="y", ylim=10^c(-1,4), 
-         panel.first = { abline(v=1+cumsum(c(1,31,29,31,30,31,30,31)), col="grey", lwd=1.5);   
-           abline(v=7*c(1:52), col="grey", lty=3); 
+         log="y", ylim=10^c(-1,4),
+         panel.first = { abline(v=1+cumsum(c(1,31,29,31,30,31,30,31)), col="grey", lwd=1.5);
+           abline(v=7*c(1:52), col="grey", lty=3);
            abline(h=10^c(-1:4), col="grey") })
     points(sub.y, y[sub.y]/con.pop, cex=0.9, col="red")
     
     # if some countries are chosen, plot them to compare with average
     if (is.null(chosen.countries) == FALSE){
+      print("True")
       avg.con.deaths = colMeans(mat.deaths, T)
       avg.con.cases = colMeans(mat.cases, T)
       plot(1:n.days, avg.con.cases/con.pop, ylab="Cases per million compared with continent's avg", 
@@ -92,6 +93,7 @@ deaths.cases.Continent = function(continent, chosen.countries=NULL, pop=CountryP
            log="y", ylim=10^c(-1,4))
       cl = rainbow(length(chosen.countries))
       for (i in 1:length(chosen.countries)){
+        print(mat.cases[chosen.countries[i]])
         points(1:n.days, mat.cases[chosen.countries[i],]/pop[countries[i]], col=cl[i], pch="+")
       }
       # legend(1,1000, legend=c("continent's average", chosen.countries))

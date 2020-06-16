@@ -4,6 +4,7 @@
 source("main.R") # get the function plot.Country
 library(gam) # not default lib in my current version of R
 library(ggplot2)
+library(dyn)
 
 DeathsByCountry <- unlist(readRDS("DeathsByCountry.rds")[[1]])
 CasesByCountry <- unlist(readRDS("CasesByCountry.rds")[[1]])
@@ -115,31 +116,51 @@ boxplot(log(1+au_d),main= "Australia",ylab="Death per day(log)")
 ###Outliers
 tail(sort(au_d))#3,4,4,4,4,5
 tail(sort(au_c))#333,337,363,393,442,448
-###New_Zealand
-nz_d <- DeathsByCountry["New_Zealand",]
-nz_c<- CasesByCountry["New_Zealand",]
+plot.all.countries.Continent("Asia")
+dist.deaths.cases.Continent("Asia")
+###UAE
+uae_d <- DeathsByCountry["United_Arab_Emirates",]
+uae_c<- CasesByCountry["United_Arab_Emirates",]
 par(mfrow=c(1,2))
-hist(nz_c,main = "New_Zealand cases density",breaks=15,xlab = "New cases per day")
-abline(v = mean(nz_c), col = "blue", lwd = 2)
-hist(nz_d,main="New_Zealand deaths densitiy",breaks = 15,xlab="Deaths per day")
-abline(v = mean(nz_d), col = "blue", lwd = 2)
+hist(uae_c,main = "UAE cases density",breaks=15,xlab = "New cases per day")
+abline(v = mean(uae_c), col = "blue", lwd = 2)
+hist(uae_d,main="UAE deaths densitiy",breaks = 15,xlab="Deaths per day")
+abline(v = mean(uae_d), col = "blue", lwd = 2)
+
 par(mfrow=c(1,2))
-boxplot(nz_c,main= "New_Zealand",ylab="Cases per day")
-boxplot(nz_d,main= "New_Zealand",ylab="Death per day")
-hist(log(1+nz_c),main = "New_Zealand cases density",breaks=15,xlab = "New cases per day(log)")
-abline(v = mean(log(1+nz_c)), col = "blue", lwd = 2)
-hist(log(1+nz_d),main="New_Zealand deaths densitiy",breaks = 15,xlab="Deaths per day(log)")
-abline(v = mean(log(1+nz_d)), col = "blue", lwd = 2)
+boxplot(uae_c,main= "UAE",ylab="Cases per day")
+boxplot(uae_d,main= "UAE",ylab="Death per day")
+hist(log(1+uae_c),main = "UAE log cases density",breaks=15,xlab = "New cases per day(log)")
+abline(v = mean(log(1+uae_c)), col = "blue", lwd = 2)
+hist(log(1+uae_d),main="UAE log deaths densitiy",breaks = 15,xlab="Deaths per day(log)")
+abline(v = mean(log(1+uae_d)), col = "blue", lwd = 2)
 par(mfrow=c(1,2))
-boxplot(log(1+nz_c),main= "New_Zealand",ylab="Cases per day(log)")
-boxplot(log(1+nz_d),main= "New_Zealand",ylab="Death per day(log)")
-###Outliers
-tail(sort(nz_d))#1,1,1,1,2,2
-tail(sort(nz_c))#59,65,71,71,76,77
-#Other
-plot.Country("Cases_on_an_international_conveyance_Japan",names=CountryNames,  deaths=DeathsByCountry, cases=CasesByCountry, pop=CountryPop,plot=T,plot.cumul = T,xmin=50)
+boxplot(log(1+uae_c),main= "UAE",ylab="Cases per day(log)")
+boxplot(log(1+uae_d),main= "UAE",ylab="Death per day(log)")
+###Outliers, missing values
+tail(sort(uae_d))#9,9,9,9,10,11
+tail(sort(uae_c))#828,862,882,900,903,943
+par(mfrow=c(1,3))
+plot.Country("United_Arab_Emirates",names=CountryNames,  deaths=DeathsByCountry, cases=CasesByCountry, pop=CountryPop,plot=T,plot.cumul = T,xmin=50)
+###range of variables
+range(uae_d) #range of deaths per day 0-11
+range(uae_c) #range of cases per day 0-943
+plot.Country("Qatar",names=CountryNames,  deaths=DeathsByCountry, cases=CasesByCountry, pop=CountryPop,plot=T,plot.cumul = T,xmin=50)
+plot.Country("Saudi_Arabia",names=CountryNames,  deaths=DeathsByCountry, cases=CasesByCountry, pop=CountryPop,plot=T,plot.cumul = T,xmin=50)
+plot.Country("Kuwait",names=CountryNames,  deaths=DeathsByCountry, cases=CasesByCountry, pop=CountryPop,plot=T,plot.cumul = T,xmin=50)
+###covariate part
 
-
-
+###modelling,glm,gam
+scatter.smooth(x=uae_c, y=uae_d,xlab="Cases",ylab="Deaths",main="Deaths agains cases in UAE")
+lag=29
+yt<-ts(uae_d)
+xt<-ts(uae_c)
+dyn$glm(yt ~lag(xt, 14))
+##
+smooth_uae_c <- rounded.moving.average(uae_c,smooth=T)
+smooth_uae_d <- rounded.moving.average(uae_d,smooth=T)
+y <- ts(log(1+smooth_uae_d))
+x <- ts(log(1+smooth_uae_c))
+dyn$glm(y~lag(x, 14))
 
 
