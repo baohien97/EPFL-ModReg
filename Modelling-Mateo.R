@@ -19,7 +19,7 @@ CountryNames <- readRDS("CountryNames.rds")
 l_max = 10 # number of previous days to take into account
 par(mfrow=c(1,3))
 plot.Country("Kuwait", names=CountryNames, deaths=DeathsByCountry, cases=CasesByCountry, pop=CountryPop, plot=T,plot.cumul=T,xmin=50)
-# Kuwait, Qatar, Saudi Arabia and United Arab Emirates
+# Kuwait, Saudi Arabia and United Arab Emirates
 country = "Kuwait"
 deaths.country = DeathsByCountry[country,]
 cases.country = CasesByCountry[country,]
@@ -76,7 +76,15 @@ cooks.distance(gam.mod)
 AIC(gam.mod)
 summary(gam.mod)$r.sq
 ggplot(merged, aes(mu.cases.t, mu.deaths.t)) + geom_point() + geom_smooth(method = "gam")
-#mgcv::plot.gam(gam.mod,shade = TRUE,shade.col = "grey",bty = "l")
+###gam with cubic spline
+gam.mod1 <- gam(mu.deaths.t ~ s(mu.cases.t,bs="cr"),data = merged)
+summary(gam.mod1)
+par(mfrow=c(1,4))
+plot(gam.mod1)
+#loess
+gam.mod2 <- loess(mu.deaths.t ~ mu.cases.t,data = merged)
+summary(gam.mod2)
+ggplot(merged, aes(mu.cases.t, mu.deaths.t)) + geom_point() + geom_smooth(method = "loess")
 ###the same for 4 countries together
 deaths.sum <- (DeathsByCountry["Kuwait",]+ DeathsByCountry["Qatar",]+ DeathsByCountry["United_Arab_Emirates",]+ DeathsByCountry["Saudi_Arabia",])
 cases.sum <- (CasesByCountry["Kuwait",]+ CasesByCountry["Qatar",]+ CasesByCountry["United_Arab_Emirates",]+ CasesByCountry["Saudi_Arabia",])
