@@ -1,14 +1,16 @@
 source("main.R") # get the function plot.Country
 library(gam) # not default lib in my current version of R
 library(ggplot2)
-
+library(mgcv)
+library(aods3)
+library(MASS)
 deaths <- read.csv("latest_data.csv")
 DeathsByCountry <- unlist(readRDS("DeathsByCountry.rds")[[1]])
 CasesByCountry <- unlist(readRDS("CasesByCountry.rds")[[1]])
 CountryPop <- unlist(readRDS("CountryPop.rds")[[1]])
 CountryNames <- readRDS("CountryNames.rds")
 
-#### modelling,glm,gam ####
+###modelling,glm,gam
 
 # We model number of deaths as a fraction of cases confirmed on l previous 
 # days (smoothened)
@@ -17,21 +19,11 @@ l_max = 29 # number of previous days to take into account
 #plot.Country("Kuwait", names=CountryNames, deaths=DeathsByCountry, cases=CasesByCountry, pop=CountryPop, plot=T,plot.cumul=T,xmin=50)
 # Kuwait, Qatar, Saudi Arabia and United Arab Emirates
 
-country = "United_Arab_Emirates"
-deaths.country = (DeathsByCountry[country,])
-cases.country = (CasesByCountry[country,])
-plot(cases.country, deaths.country, main=country, xlab="cases", ylab="deaths")
-abline(lm(deaths.country~cases.country), col="red")
-
-
-deaths.country.cumul = cumsum(DeathsByCountry[country,])
-cases.country.cumul = cumsum(CasesByCountry[country,])
-
-mu.deaths.t = c() 
+country = "Kuwait"
+deaths.country = DeathsByCountry[country,]
+cases.country = CasesByCountry[country,]
+mu.deaths.t = c()
 mu.cases.t = c()
-
-# mu.deaths.cumul = c()
-# mu.cases.cumul = c()
 
 for (i in (l_max + 1):length(deaths.country)){
   mu.cases.t[i-l_max] <- log(1+mean(cases.country[(i - l_max): i]))  # plus 1 to avoid log(0)
@@ -65,8 +57,8 @@ plot(quasi_poiss)
 
 
 ###the same for 4 countries together
-deaths.sum <- cumsum(DeathsByCountry["Kuwait",]+ DeathsByCountry["Qatar",]+ DeathsByCountry["United_Arab_Emirates",]+ DeathsByCountry["Saudi_Arabia",])
-cases.sum <- cumsum(CasesByCountry["Kuwait",]+ CasesByCountry["Qatar",]+ CasesByCountry["United_Arab_Emirates",]+ CasesByCountry["Saudi_Arabia",])
+deaths.sum <- (DeathsByCountry["Kuwait",]+ DeathsByCountry["Qatar",]+ DeathsByCountry["United_Arab_Emirates",]+ DeathsByCountry["Saudi_Arabia",])
+cases.sum <- (CasesByCountry["Kuwait",]+ CasesByCountry["Qatar",]+ CasesByCountry["United_Arab_Emirates",]+ CasesByCountry["Saudi_Arabia",])
 mu.deaths.sum = c()
 mu.cases.sum = c()
 
@@ -82,11 +74,5 @@ summary(lin.mod.more.countries)
 par(mfrow=c(1,4)) # Change the panel layout to 1 x 4
 plot(lin.mod.more.countries)
 
-#### modelling non-linear y= ax/(b+x) ####
-x = mu.cases.t
-mm.mod <- nls(mu.deaths.t ~ a*x/(b+x))
-par(mfrow=c(1,4)) # Change the panel layout to 1 x 4
-plot(predict(mm.mod), mu.deaths.t)
 
-#### modelling gam ####
 

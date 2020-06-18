@@ -122,7 +122,7 @@ plot.all.countries.Continent = function(continent,
   pop = data.frame(CountryPop)
   colnames(pop) = c("country.pop")
   no.cases.countries = c()
-  for (i in 1:dim(mat)[1]){
+  for (i in 1:dim(cases)[1]){
     country = rownames(cases)[i]
     #print(country)
     if (all(cases[country,] == 0) || all(is.na(cases[country,]))){
@@ -168,6 +168,7 @@ dist.deaths.cases.Continent = function(continent, day=NULL, pop=CountryPop, name
   
   if (is.null(day)){
     day = which.max(colSums(cases, T)) # take the day with the highest number of cases
+    print(day)
   }
   dimnames <- list(country=rownames(cases), time=1:dim(cases)[2])
   mat <- matrix(cases, ncol=dim(cases)[2], nrow=dim(cases)[1], dimnames=dimnames)
@@ -188,7 +189,8 @@ dist.deaths.cases.Continent = function(continent, day=NULL, pop=CountryPop, name
   # + geom_histogram(aes(y=..density..),      # Histogram with density instead of count on y-axis
   #                                          binwidth=.5,
   #                                          colour="black", fill="white") 
-  geom_histogram(alpha=.2) 
+  geom_histogram(alpha=.2) + geom_density(alpha=.2) +
+    theme(legend.position="top")
 }
 
 
