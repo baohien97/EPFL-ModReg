@@ -30,23 +30,16 @@ days.of.data <- 1 + (deaths$day + 31*(deaths$month>1) + 29*(deaths$month>2) + 31
 n.days <- max(days.of.data)
 
 # rounds a 3-day moving average of a vector of counts to the nearest integer
-
 rounded.moving.average <- function(x, smooth=F)
 {  # weight first and last days arbitrarily as (2,1)/3 and (1,2)/3, and the rest as (1,1,1)/3
   n <- length(x)
   z <- filter(x, filter=rep(1, 3)/3)  # leaves NAs as z[1] and z[n]
   z[1] <- (2*x[1]+x[2])/3  
   z[n] <- (x[n-1]+2*x[n])/3
-  out <- round(z)days.of.data <- 1 + (deaths$day + 31*(deaths$month>1) + 29*(deaths$month>2) + 31*(deaths$month>3) + 30*(deaths$month>4)
-                                      + 31*(deaths$month>5) + 30*(deaths$month>6) + 31*(deaths$month>7) + 31*(deaths$month>8) 
-                                      + 30*(deaths$month>9) + 31*(deaths$month>10) + 30*(deaths$month>11) )*(deaths$year==2020) 
-  n.days <- max(days.of.data)
-  
-  # rounds a 3-day mov
+  out <- round(z)
   if (!smooth) out <- x  # output original data if smooth=F
   out
 }
-
 # set up matrices with countries by rows and time as columns
 
 DeathsByCountry <- matrix(0, nc, n.days, dimnames = list(CountryNames))
